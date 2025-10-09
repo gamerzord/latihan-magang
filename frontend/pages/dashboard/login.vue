@@ -63,9 +63,9 @@ const handleLogin = async () => {
       },
       credentials: 'include'
     })
-    
     await navigateTo('/')
   } catch (err: any) {
+    console.error('Login Failed', err)
     errorMessage.value = err?.data?.message || 'Invalid login'
   } finally {
     loading.value = false

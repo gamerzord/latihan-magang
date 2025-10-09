@@ -1,6 +1,7 @@
-import { resolve } from 'path'
-import { defineNuxtConfig } from 'nuxt/config'
+import { resolve } from 'path';
+import { defineNuxtConfig } from 'nuxt/config';
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -8,21 +9,27 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBase: 'http://127.0.0.1:8000/api',
+      apiBase: 'https://127.0.0.1:8000/api',
     },
   },
 
   typescript: { shim: false },
 
+  devServer: {
+    https: true,
+  },
+
   vite: {
+    plugins: [basicSsl()],
     server: {
       proxy: {
         '/api': {
-        target: 'http://127.0.0.1:8000',
-        changeOrigin: true,
+          target: 'https://127.0.0.1:8000',
+          changeOrigin: true,
+          secure: false, 
+        },
       },
     },
-  },
     vue: {
       template: {
         transformAssetUrls,
@@ -39,8 +46,9 @@ export default defineNuxtConfig({
         // @ts-expect-error
         config.plugins.push(vuetify({ 
           styles: {configFile: resolve(__dirname, 'assets/styles/index.scss')},
-          autoImport: true }))
-      })
+          autoImport: true,
+        }));
+      });
     },
     '@nuxt/eslint',
   ],

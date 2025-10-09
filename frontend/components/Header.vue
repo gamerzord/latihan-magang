@@ -12,7 +12,7 @@
         <!-- Desktop Menu -->
         <v-col cols="auto" class="hidden-sm-and-down">
           <div class="menu-wrapper">
-            <template v-for="item in menuItems" :key="item.text">
+            <template v-for="(item, index) in menuItems" :key="item.text">
               <v-menu
                 v-if="item.children"
                 offset-y

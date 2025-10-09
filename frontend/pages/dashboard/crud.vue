@@ -80,6 +80,7 @@
       <div class="mt-6">
         <v-btn to="/dashboard/register" color="primary" class="mr-2">Register</v-btn>
         <v-btn to="/dashboard/login" color="secondary" class="mr-2">Login</v-btn>
+        <v-btn color="error" @click="logout">Logout</v-btn>
       </div>
     </v-card>
   </v-container>
@@ -145,4 +146,17 @@ const deleteUser = async (id: number) => {
   refreshUsers()
 }
 
+const logout = async () => {
+  try {
+    await $fetch(`${config.public.apiBase}/logout`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  } catch (e) {
+    console.error('Logout failed:', e)
+  } finally {
+    localStorage.removeItem('token')
+    navigateTo('/dashboard/login')
+  }
+}
 </script>

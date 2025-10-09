@@ -8,6 +8,9 @@
         <v-text-field v-model="password" label="Password" type="password" />
         <v-btn color="primary" type="submit">Register</v-btn>
       </v-form>
+      <v-alert v-if="errorMessage" type="error" class="mb-4">
+        {{ errorMessage }}
+      </v-alert>
     </v-card>
   </v-container>
 </template>
@@ -20,6 +23,8 @@ const password = ref('')
 const errorMessage = ref('')
 
 const register = async () => {
+  errorMessage.value = ''
+
   try {
     await $fetch(`${config.public.apiBase}/users`, {
       method: 'POST',
@@ -27,6 +32,7 @@ const register = async () => {
     })
     navigateTo('/login')
   } catch (err: any) {
+    console.error('Register Failed', err)
     errorMessage.value = err?.data?.message || 'Failed to register'
   }
 }

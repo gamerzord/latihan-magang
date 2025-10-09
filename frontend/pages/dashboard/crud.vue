@@ -2,19 +2,15 @@
   <v-container>
     <v-card class="pa-6">
       <v-card-title>Simple CRUD</v-card-title>
-
-      <v-alert
-        v-if="successMessage"
-        type="success"
-        class="mb-4"
-      >
+      <v-alert v-if="successMessage" type="success" class="mb-4">
         {{ successMessage }}
       </v-alert>
-
+      <v-alert v-if="errorMessage" type="error" class="mb-4">
+        {{ errorMessage }}
+      </v-alert>
       <v-row>
         <v-col cols="12" md="6">
           <h2>Products</h2>
-
           <v-data-table
             :items="products || []"
             :headers="productHeaders"
@@ -76,7 +72,6 @@
           </v-data-table>
         </v-col>
       </v-row>
-
       <div class="mt-6">
         <v-btn to="/dashboard/register" color="primary" class="mr-2">Register</v-btn>
         <v-btn to="/dashboard/login" color="secondary" class="mr-2">Login</v-btn>
@@ -91,24 +86,18 @@ import type { Product, User } from '~/types/models'
 
 const successMessage = ref('')
 const config = useRuntimeConfig()
-
-const token = localStorage.getItem('token')
-if (!token) throw new Error('Not logged in')
+const loading = ref(false)
+const errorMessage = ref('')
 
 const { data: products, pending: pendingProducts, refresh: refreshProducts } =
   await useFetch<Product[]>(`${config.public.apiBase}/products`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
+    credentials: 'include'
   })
 
 const { data: users, pending: pendingUsers, refresh: refreshUsers } =
   await useFetch<User[]>(`${config.public.apiBase}/users`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
+    credentials: 'include'
   })
-
 
 const productHeaders = [
   { title: 'ID', key: 'id' },
@@ -127,36 +116,56 @@ const userHeaders = [
 ]
 
 const deleteProduct = async (id: number) => {
-  const token = localStorage.getItem('token')
-  await $fetch(`${config.public.apiBase}/products/${id}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  successMessage.value = 'Product deleted successfully'
-  refreshProducts()
+  loading.value = true
+  errorMessage.value = ''
+
+  try {
+    await $fetch(`${config.public.apiBase}/products/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+    successMessage.value = 'Product deleted successfully'
+    refreshProducts()
+  } catch (err: any) {
+    console.error('Delete failed:', err)
+    errorMessage.value = err?.data?.message || 'Delete Failure'
+  } finally {
+    loading.value = false
+  }
 }
 
 const deleteUser = async (id: number) => {
-  const token = localStorage.getItem('token')
-  await $fetch(`${config.public.apiBase}/users/${id}`, {
+  loading.value = true
+  errorMessage.value =''
+
+  try {
+    await $fetch(`${config.public.apiBase}/users/${id}`, {
     method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` }
+    credentials: 'include'
   })
   successMessage.value = 'User deleted successfully'
   refreshUsers()
+  } catch (err: any) {
+    console.error('Delete failed:', err)
+    errorMessage.value = err?.data?.message || 'Delete Failure'
+  } finally {
+    loading.value = false
+  }
 }
 
 const logout = async () => {
+  errorMessage.value = ''
+
   try {
     await $fetch(`${config.public.apiBase}/logout`, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
+      credentials: 'include'
     })
-  } catch (e) {
-    console.error('Logout failed:', e)
+  } catch (err: any) {
+    console.error('Logout failed:', err)
+    errorMessage.value = err?.data?.message || 'Logout Failure'
   } finally {
-    localStorage.removeItem('token')
-    navigateTo('/dashboard/login')
+    await navigateTo('/dashboard/login')
   }
 }
 </script>

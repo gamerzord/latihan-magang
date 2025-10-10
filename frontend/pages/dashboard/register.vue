@@ -30,7 +30,7 @@ const register = async () => {
       method: 'POST',
       body: { name: name.value, email: email.value, password: password.value },
     })
-    navigateTo('/login')
+    navigateTo('/dashboard/login')
   } catch (err: any) {
     console.error('Register Failed', err)
     errorMessage.value = err?.data?.message || 'Failed to register'

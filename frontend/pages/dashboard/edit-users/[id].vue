@@ -20,6 +20,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
 import type { User } from '~/types/models'
 
 const route = useRoute()

@@ -82,6 +82,15 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
+onMounted(() => {
+  const role = localStorage.getItem('user_role')
+  if (role !== 'admin') {
+    navigateTo('/')
+  }
+})
+
+const token = localStorage.getItem('auth_token')
 import type { Product, User } from '~/types/models'
 
 const successMessage = ref('')
@@ -91,12 +100,16 @@ const errorMessage = ref('')
 
 const { data: products, pending: pendingProducts, refresh: refreshProducts } =
   await useFetch<Product[]>(`${config.public.apiBase}/products`, {
-    credentials: 'include'
+    headers: {
+        'Authorization': `Bearer ${token}`,
+      }
   })
 
 const { data: users, pending: pendingUsers, refresh: refreshUsers } =
   await useFetch<User[]>(`${config.public.apiBase}/users`, {
-    credentials: 'include'
+    headers: {
+        'Authorization': `Bearer ${token}`,
+      }
   })
 
 const productHeaders = [
@@ -122,7 +135,9 @@ const deleteProduct = async (id: number) => {
   try {
     await $fetch(`${config.public.apiBase}/products/${id}`, {
       method: 'DELETE',
-      credentials: 'include'
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
     })
     successMessage.value = 'Product deleted successfully'
     refreshProducts()
@@ -141,7 +156,9 @@ const deleteUser = async (id: number) => {
   try {
     await $fetch(`${config.public.apiBase}/users/${id}`, {
     method: 'DELETE',
-    credentials: 'include'
+    headers: {
+        'Authorization': `Bearer ${token}`,
+      }
   })
   successMessage.value = 'User deleted successfully'
   refreshUsers()
@@ -159,7 +176,9 @@ const logout = async () => {
   try {
     await $fetch(`${config.public.apiBase}/logout`, {
       method: 'POST',
-      credentials: 'include'
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
     })
   } catch (err: any) {
     console.error('Logout failed:', err)

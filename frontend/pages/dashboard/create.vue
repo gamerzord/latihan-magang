@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
 const config = useRuntimeConfig()
 
 const name = ref('')
@@ -31,6 +32,7 @@ const createProduct = async () => {
   errorMessage.value = ''
 
   try {
+    const token = localStorage.getItem('auth_token')
     await $fetch(`${config.public.apiBase}/products`, {
       method: 'POST',
       body: {
@@ -39,7 +41,9 @@ const createProduct = async () => {
         price: price.value,
         description: description.value,
       },
-      credentials: "include"
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      }
     })
     navigateTo('/dashboard/crud')
   } catch (err: any) {

@@ -28,7 +28,12 @@
                     <v-icon size="14" class="ml-1">mdi-chevron-down</v-icon>
                   </v-btn>
                 </template>
-
+                <v-btn
+                  v-if="isAdmin"
+                  text
+                  to="/dashboard/crud"
+                  class="nav-btn"
+                 ></v-btn> 
                 <v-list class="dropdown-list">
                   <v-list-item
                     v-for="sub in item.children"
@@ -114,6 +119,13 @@ const menuItems = [
   { text: 'Lowongan', link: 'https://karir.traspac.id/' },
   { text: 'Kontak', link: '/contact' }
 ]
+
+const isAdmin = ref(false)
+
+onMounted(() => {
+  isAdmin.value = localStorage.getItem('user_role') === 'admin'
+})
+
 </script>
 
 <style scoped>
@@ -158,6 +170,10 @@ const menuItems = [
 
 .dropdown-item:hover { 
   background-color: rgba(255, 255, 255, 0.2); 
+}
+
+.dot-separator {
+  color: transparent;
 }
 
 </style>

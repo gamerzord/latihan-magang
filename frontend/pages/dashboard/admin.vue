@@ -1,11 +1,11 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
     <v-card class="pa-6" max-width="600" width="100%">
-      <v-card-title>Login</v-card-title>
+      <v-card-title>Admin Login</v-card-title>
       <v-form @submit.prevent="handleLogin">
         <v-text-field 
           v-model="email" 
-          label="Email"
+          label="Admin Email"
           :disabled="loading"
         />
         <v-text-field 
@@ -16,28 +16,20 @@
         />
         <div>
           <v-btn 
-            color="primary" 
+            color="deep-purple-accent-4"
             type="submit" 
             class="mr-2"
             :loading="loading"
             :disabled="loading"
           >
-            Login
+            Login as Admin
           </v-btn>
           <v-btn 
-            to="/dashboard/register" 
-            color="secondary" 
-            class="mr-2"
+            to="/dashboard/login" 
+            color="secondary"
             :disabled="loading"
           >
-            Register
-          </v-btn>
-          <v-btn 
-            to="/dashboard/admin" 
-            color="deep-purple-accent-4"
-            :disabled="loading"
-          >
-            Admin Login
+            Back to User Login
           </v-btn>
         </div>
       </v-form>
@@ -72,12 +64,13 @@ const handleLogin = async () => {
     
     if (data.token) {
       localStorage.setItem('auth_token', data.token)
+      localStorage.setItem('user_role', data.user.role) 
     }
 
     await navigateTo('/')
   } catch (err: any) {
-    console.error('Login Failed', err)
-    errorMessage.value = err?.data?.message || 'Invalid login'
+    console.error('Admin Login Failed', err)
+    errorMessage.value = err?.data?.message || 'Invalid admin credentials'
   } finally {
     loading.value = false
   }

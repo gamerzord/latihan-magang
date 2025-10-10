@@ -1,5 +1,4 @@
 <template>
-  <v-app>
     <Header />
     
     <v-main>
@@ -10,8 +9,8 @@
     </v-main>
 
     <Footer />
-  </v-app>
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
 </script>

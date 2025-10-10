@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ middleware: 'auth' })
 import type { Product } from '~/types/models'
 
 const route = useRoute()
@@ -55,9 +56,9 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
-const { data: product, pending } = await useFetch<Product>(
+const { data: product, pending, refresh } = await useFetch<Product>(
   `${config.public.apiBase}/products/${id}`,
-  { credentials: 'include' }
+  { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
 )
 
 const updateProduct = async () => {
@@ -68,6 +69,7 @@ const updateProduct = async () => {
   successMessage.value = ''
   
   try {
+    const token = localStorage.getItem('token')
     await $fetch(`${config.public.apiBase}/products/${id}`, {
       method: 'PUT',
       body: product.value,

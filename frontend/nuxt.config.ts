@@ -1,44 +1,56 @@
-import { resolve } from 'path';
-import { defineNuxtConfig } from 'nuxt/config';
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+import { defineNuxtConfig } from 'nuxt/config'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
   typescript: { shim: false },
-  
+  pages: true,
+
   devServer: {
     https: {
-      key: './key.pem',
-      cert: './cert.pem',
+      key: './localhost-key.pem',
+      cert: './localhost.pem',
     },
     port: 3000,
-    host: 'localhost'
+    host: 'localhost',
   },
-  
+
   css: [
     'vuetify/styles',
     '@mdi/font/css/materialdesignicons.css',
+    'assets/styles/index.scss'
   ],
-  
+
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
-  
+
   runtimeConfig: {
     public: {
-      apiBase: 'https://127.0.0.1/api',
+      apiBase: 'https://localhost/api',
     },
   },
-  
-  ssr: true, // or false if you want SPA mode
-  
+
   vite: {
     server: {
+      hmr: {
+        host: 'localhost',
+        port:3000,
+        protocol: 'wss'
+      },
       proxy: {
         '/api': {
-          target: 'https://127.0.0.1',
+          target: 'https://localhost',
           changeOrigin: true,
-          secure: false, // Add this for self-signed certs
+          secure: false,
+        },
+        '/sanctum': {
+          target: 'https://localhost',
+          changeOrigin: true,
+          secure: false,
         },
       },
+    },
+    ssr: {
+      noExternal: ['vuetify'],
     },
     vue: {
       template: {
@@ -46,21 +58,22 @@ export default defineNuxtConfig({
       },
     },
   },
-  
+
   modules: [
-    (_options, nuxt) => {
+    '@nuxt/eslint',
+    async (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error
-        config.plugins.push(vuetify({
-          styles: { configFile: resolve(__dirname, 'assets/styles/index.scss') },
-          autoImport: true,
-        }));
-      });
+        config.plugins.push(
+          vuetify({
+            autoImport: true,
+          })
+        )
+      })
     },
-    '@nuxt/eslint',
   ],
-  
+
   build: {
     transpile: ['vuetify'],
   },
-});
+})

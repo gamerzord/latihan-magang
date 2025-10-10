@@ -11,13 +11,10 @@ export interface User {
   name: string
   email: string
   password: string
+  role: string
 }
 
 interface LoginResponse {
-  user: {
-    id: number
-    name: string
-    email: string
-  }
   token: string
+  user: user
 }

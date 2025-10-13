@@ -1,5 +1,5 @@
 <template>
-    <Header />
+    <Header position="fixed" />
     
     <v-main>
       <HeroSection />

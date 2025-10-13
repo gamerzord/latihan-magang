@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 Route::post('/users', [UserController::class, 'register']); // registration
 
 // Protected routes

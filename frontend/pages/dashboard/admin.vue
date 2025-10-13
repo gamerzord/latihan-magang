@@ -54,7 +54,7 @@ const handleLogin = async () => {
   errorMessage.value = ''
   
   try {
-    const data = await $fetch<LoginResponse>(`${config.public.apiBase}/login`, {
+    const data = await $fetch<LoginResponse>(`${config.public.apiBase}/admin/login`, {
       method: 'POST',
       body: { 
         email: email.value, 
@@ -63,7 +63,7 @@ const handleLogin = async () => {
     })
     
     if (data.token) {
-      localStorage.setItem('auth_token', data.token)
+      localStorage.setItem('admin_auth_token', data.token)
       localStorage.setItem('user_role', data.user.role) 
     }
 

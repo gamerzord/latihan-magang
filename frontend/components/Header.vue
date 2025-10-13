@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app elevation="0" color="transparent" class="header">
+  <v-app-bar elevation="0" color="transparent" class="header">
     <v-container fluid>
       <v-row align="center" no-gutters>
         <v-col cols="auto">
@@ -8,7 +8,6 @@
 
         <v-spacer />
 
-        <!-- DROPDOWN WEIRD -->
         <!-- Desktop Menu -->
         <v-col cols="auto" class="hidden-sm-and-down">
           <div class="menu-wrapper">
@@ -28,12 +27,6 @@
                     <v-icon size="14" class="ml-1">mdi-chevron-down</v-icon>
                   </v-btn>
                 </template>
-                <v-btn
-                  v-if="isAdmin"
-                  text
-                  to="/dashboard/crud"
-                  class="nav-btn"
-                 ></v-btn> 
                 <v-list class="dropdown-list">
                   <v-list-item
                     v-for="sub in item.children"
@@ -53,9 +46,9 @@
                 class="nav-btn"
               >
                 {{ item.text }}
-            </v-btn>
+              </v-btn>
 
-            <span v-if="index < menuItems.length - 1" class="dot-separator">•</span>
+              <span v-if="index < menuItems.length - 1" class="dot-separator">•</span>
             </template>
           </div>
         </v-col>
@@ -125,18 +118,13 @@ const isAdmin = ref(false)
 onMounted(() => {
   isAdmin.value = localStorage.getItem('user_role') === 'admin'
 })
-
 </script>
 
 <style scoped>
 .header {
-  background-color: transparent !important;
-  color: white !important;
+  position: static !important;
+  background: transparent !important;
   box-shadow: none !important;
-  backdrop-filter: none !important;
-  position: absolute;
-  width: 100%;
-  z-index: 100;
 }
 
 .menu-wrapper {
@@ -175,5 +163,4 @@ onMounted(() => {
 .dot-separator {
   color: transparent;
 }
-
 </style>

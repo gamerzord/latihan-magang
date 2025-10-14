@@ -59,7 +59,7 @@ const updateUser = async () => {
     })
 
     successMessage.value = 'User updated successfully!'
-    setTimeout(() => navigateTo('/crud'), 1000)
+    setTimeout(() => navigateTo('/dashboard/crud'), 1000)
   } catch (err: any) {
     console.error('Update Failed', err)
     errorMessage.value = err?.data?.message || 'Failed to update user'

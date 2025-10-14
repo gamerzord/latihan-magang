@@ -84,7 +84,7 @@ const updateProduct = async () => {
     })
 
     successMessage.value = 'Product updated successfully!'
-    setTimeout(() => navigateTo('/crud'), 1500)
+    setTimeout(() => navigateTo('/dashboard/crud'), 1500)
   } catch (err: any) {
     console.error('Update failed:', err)
     errorMessage.value = err?.data?.message || 'Failed to update product'

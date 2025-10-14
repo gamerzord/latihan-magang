@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware((to) => {
-  if (process.client) {
+  if (import.meta.client) {
     const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
    
     if (navigationEntry && navigationEntry.type === 'reload') {

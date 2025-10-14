@@ -56,7 +56,7 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
-const token = localStorage.getItem('token')
+const token = localStorage.getItem('auth_token')
 
 const { data: product, pending, refresh } = await useFetch<Product>(
   `${config.public.apiBase}/products/${id}`,

@@ -30,24 +30,34 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
+const token = localStorage.getItem('token')
+
 const { data: user, pending, refresh } = await useFetch<User>(
   `${config.public.apiBase}/users/${id}`,
-  { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
 )
 
 const updateUser = async () => {
+  
   loading.value = true
   errorMessage.value = ''
+  successMessage.value = ''
 
   if (!user.value) return
 
   try {
-    const token = localStorage.getItem('token')
     await $fetch(`${config.public.apiBase}/users/${id}`, {
       method: 'PUT',
       body: user.value,
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { 
+        Authorization: `Bearer ${token}` 
+      },
     })
+    
     successMessage.value = 'User updated successfully!'
     setTimeout(() => navigateTo('/dashboard'), 1000)
   } catch (err: any) {

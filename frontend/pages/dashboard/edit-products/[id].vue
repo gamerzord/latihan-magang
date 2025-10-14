@@ -56,28 +56,37 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
+const token = localStorage.getItem('token')
+
 const { data: product, pending, refresh } = await useFetch<Product>(
   `${config.public.apiBase}/products/${id}`,
-  { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
 )
 
 const updateProduct = async () => {
   if (!product.value) return
-  
+
   loading.value = true
   errorMessage.value = ''
   successMessage.value = ''
-  
+
   try {
-    const token = localStorage.getItem('token')
     await $fetch(`${config.public.apiBase}/products/${id}`, {
       method: 'PUT',
       body: product.value,
-      credentials: 'include'
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
+
     successMessage.value = 'Product updated successfully!'
     setTimeout(() => navigateTo('/dashboard'), 1500)
   } catch (err: any) {
+    console.error('Update failed:', err)
     errorMessage.value = err?.data?.message || 'Failed to update product'
   } finally {
     loading.value = false

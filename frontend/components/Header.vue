@@ -1,12 +1,10 @@
 <template>
   <v-app-bar elevation="0" color="transparent" class="header">
-    <v-container fluid>
+    <v-container>
       <v-row align="center" no-gutters>
-        <v-col cols="auto">
+        <v-col cols="auto" class="logo-col">
           <img src="/logo.png" alt="Traspac Logo" height="40" />
         </v-col>
-
-        <v-spacer />
 
         <!-- Desktop Menu -->
         <v-col cols="auto" class="hidden-sm-and-down">
@@ -125,13 +123,24 @@ onMounted(() => {
   position: static !important;
   background: transparent !important;
   box-shadow: none !important;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+.logo-col {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 .menu-wrapper {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 32px;
+  gap: auto;
 }
 
 .nav-btn {

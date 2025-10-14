@@ -98,10 +98,11 @@ const prevSlide = () => {
 .hero-section {
   background: transparent !important;
   min-height: 100vh;
+  padding-top: 80px !important;
 }
 
 .hero-content {
-  min-height: 100vh;
+  min-height: calc(100vh-80px);
   color: white;
   backdrop-filter: none;
 }

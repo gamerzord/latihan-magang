@@ -177,14 +177,23 @@ const logout = async () => {
     await $fetch(`${config.public.apiBase}/logout`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
   } catch (err: any) {
     console.error('Logout failed:', err)
     errorMessage.value = err?.data?.message || 'Logout Failure'
   } finally {
+    localStorage.clear()
+
+    document.cookie.split(";").forEach(c => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    })
+
     await navigateTo('/dashboard/login')
   }
 }
+
 </script>

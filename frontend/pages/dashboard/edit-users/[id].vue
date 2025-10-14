@@ -30,7 +30,7 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
-const token = localStorage.getItem('token')
+const token = localStorage.getItem('auth_token')
 
 const { data: user, pending, refresh } = await useFetch<User>(
   `${config.public.apiBase}/users/${id}`,
@@ -57,9 +57,9 @@ const updateUser = async () => {
         Authorization: `Bearer ${token}` 
       },
     })
-    
+
     successMessage.value = 'User updated successfully!'
-    setTimeout(() => navigateTo('/dashboard'), 1000)
+    setTimeout(() => navigateTo('/crud'), 1000)
   } catch (err: any) {
     console.error('Update Failed', err)
     errorMessage.value = err?.data?.message || 'Failed to update user'

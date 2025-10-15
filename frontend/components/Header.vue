@@ -102,7 +102,8 @@ const menuItems = [
       { text: 'Budaya Kami', link: '/about/culture' },
       { text: 'CSR', link: '/about/csr' },
       { text: 'Gallery', link: '/about/gallery' },
-      { text: 'Beasiswa', link: '/about/scholarship' }
+      { text: 'Beasiswa', link: '/about/scholarship' },
+      { text: 'Employee', link: '/about/employee' }
     ]
   },
   { text: 'Produk dan Layanan', link: '/services' },

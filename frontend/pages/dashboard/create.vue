@@ -32,7 +32,7 @@ const createProduct = async () => {
   errorMessage.value = ''
 
   try {
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('admin_auth_token')
     await $fetch(`${config.public.apiBase}/products`, {
       method: 'POST',
       body: {

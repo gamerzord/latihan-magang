@@ -90,7 +90,7 @@ onMounted(() => {
   }
 })
 
-const token = localStorage.getItem('auth_token')
+const token = localStorage.getItem('admin_auth_token')
 import type { Product, User } from '~/types/models'
 
 const successMessage = ref('')

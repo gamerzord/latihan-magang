@@ -1,19 +1,10 @@
 export default defineNuxtRouteMiddleware((to) => {
-  if (import.meta.client) {
-    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
-   
-    if (navigationEntry && navigationEntry.type === 'reload') {
-      localStorage.clear()
-      useCookie('auth_token').value = null
-      console.log('Local storage cleared on page reload!')
-    }
-  }
-
   const cookieToken = useCookie('auth_token').value
-  const localToken = process.client ? localStorage.getItem('auth_token') : null
-  const token = cookieToken || localToken
+  const localToken = import.meta.client ? localStorage.getItem('auth_token') : null
+  const localTokenA = import.meta.client ? localStorage.getItem('admin_auth_token') : null
+  const token = cookieToken || localToken || localTokenA
 
-  if (['/dashboard/login', '/dashboard/register'].includes(to.path)) {
+  if (['/dashboard/login', '/dashboard/register', '/dashboard/admin'].includes(to.path)) {
     if (token) return navigateTo('/')
     return
   }

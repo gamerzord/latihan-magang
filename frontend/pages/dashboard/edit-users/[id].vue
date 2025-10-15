@@ -30,7 +30,7 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
-const token = localStorage.getItem('auth_token')
+const token = localStorage.getItem('admin_auth_token')
 
 const { data: user, pending, refresh } = await useFetch<User>(
   `${config.public.apiBase}/users/${id}`,

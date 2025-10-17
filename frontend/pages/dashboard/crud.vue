@@ -82,15 +82,13 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
-onMounted(() => {
-  const role = localStorage.getItem('user_role')
-  if (role !== 'admin') {
-    navigateTo('/')
-  }
-})
+if (import.meta.server) {
+  onMounted(() => {
+    const token = useCookie('admin-auth-token').value
+    if (!token) return navigateTo('/dashboard/admin')
+  })
+}
 
-const token = localStorage.getItem('admin_auth_token')
 import type { Product, User } from '~/types/models'
 
 const successMessage = ref('')
@@ -100,16 +98,12 @@ const errorMessage = ref('')
 
 const { data: products, pending: pendingProducts, refresh: refreshProducts } =
   await useFetch<Product[]>(`${config.public.apiBase}/products`, {
-    headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+    
   })
 
 const { data: users, pending: pendingUsers, refresh: refreshUsers } =
   await useFetch<User[]>(`${config.public.apiBase}/users`, {
-    headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+    
   })
 
 const productHeaders = [
@@ -135,9 +129,7 @@ const deleteProduct = async (id: number) => {
   try {
     await $fetch(`${config.public.apiBase}/products/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+      
     })
     successMessage.value = 'Product deleted successfully'
     refreshProducts()
@@ -156,9 +148,7 @@ const deleteUser = async (id: number) => {
   try {
     await $fetch(`${config.public.apiBase}/users/${id}`, {
     method: 'DELETE',
-    headers: {
-        'Authorization': `Bearer ${token}`,
-      }
+    
   })
   successMessage.value = 'User deleted successfully'
   refreshUsers()
@@ -176,22 +166,12 @@ const logout = async () => {
   try {
     await $fetch(`${config.public.apiBase}/logout`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      
     })
   } catch (err: any) {
     console.error('Logout failed:', err)
     errorMessage.value = err?.data?.message || 'Logout Failure'
   } finally {
-    localStorage.clear()
-
-    document.cookie.split(";").forEach(c => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    })
-
     await navigateTo('/dashboard/login')
   }
 }

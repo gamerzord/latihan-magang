@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
 import type { User } from '~/types/models'
 
 const route = useRoute()
@@ -30,15 +29,8 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
-const token = localStorage.getItem('admin_auth_token')
-
-const { data: user, pending, refresh } = await useFetch<User>(
+const { data: user} = await useFetch<User>(
   `${config.public.apiBase}/users/${id}`,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
 )
 
 const updateUser = async () => {
@@ -53,9 +45,7 @@ const updateUser = async () => {
     await $fetch(`${config.public.apiBase}/users/${id}`, {
       method: 'PUT',
       body: user.value,
-      headers: { 
-        Authorization: `Bearer ${token}` 
-      },
+      
     })
 
     successMessage.value = 'User updated successfully!'

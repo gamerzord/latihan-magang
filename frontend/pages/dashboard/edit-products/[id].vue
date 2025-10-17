@@ -12,30 +12,24 @@
         <v-text-field 
           v-model="product.name" 
           label="Name"
-          :disabled="loading"
         />
         <v-text-field 
           v-model="product.qty" 
           label="Qty" 
           type="number"
-          :disabled="loading"
         />
         <v-text-field 
           v-model="product.price" 
           label="Price" 
           type="number"
-          :disabled="loading"
         />
         <v-text-field 
           v-model="product.description" 
           label="Description"
-          :disabled="loading"
         />
         <v-btn 
           color="primary" 
           type="submit"
-          :loading="loading"
-          :disabled="loading"
         >
           Update Product
         </v-btn>
@@ -46,7 +40,6 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
 import type { Product } from '~/types/models'
 
 const route = useRoute()
@@ -56,14 +49,10 @@ const successMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
-const token = localStorage.getItem('admin_auth_token')
-
-const { data: product, pending, refresh } = await useFetch<Product>(
+const { data: product} = await useFetch<Product>(
   `${config.public.apiBase}/products/${id}`,
   {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    
   }
 )
 
@@ -78,9 +67,7 @@ const updateProduct = async () => {
     await $fetch(`${config.public.apiBase}/products/${id}`, {
       method: 'PUT',
       body: product.value,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      
     })
 
     successMessage.value = 'Product updated successfully!'

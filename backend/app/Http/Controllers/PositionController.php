@@ -130,7 +130,7 @@ class PositionController extends Controller
       ->get(['id', 'name', 'code', 'level']);
 
     return response()->json([
-      'positions' => $positions,
+      'positions_active' => $positions,
     ]);
   }
 }

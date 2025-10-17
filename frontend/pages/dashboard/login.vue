@@ -49,7 +49,6 @@
 </template>
 
 <script setup lang="ts">
-import type { LoginResponse } from '~/types/models'
 
 const config = useRuntimeConfig()
 const email = ref('')
@@ -57,26 +56,28 @@ const password = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
 
+
+
 const handleLogin = async () => {
   loading.value = true
   errorMessage.value = ''
-  
+
   try {
-    const data = await $fetch<LoginResponse>(`${config.public.apiBase}/login`, {
-      method: 'POST',
-      body: { 
-        email: email.value, 
-        password: password.value 
-      },
+    await $fetch('https://localhost/sanctum/csrf-cookie', {
+      
     })
-    
-    if (data.token) {
-      localStorage.setItem('auth_token', data.token)
-    }
+    await $fetch(`${config.public.apiBase}/login`, {
+      method: 'POST',
+      body: {
+        email: email.value,
+        password: password.value
+      },
+      
+    })
 
     await navigateTo('/')
   } catch (err: any) {
-    console.error('Login Failed', err)
+    console.error('Login failed:', err)
     errorMessage.value = err?.data?.message || 'Invalid login'
   } finally {
     loading.value = false

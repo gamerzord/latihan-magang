@@ -103,7 +103,9 @@ const menuItems = [
       { text: 'CSR', link: '/about/csr' },
       { text: 'Gallery', link: '/about/gallery' },
       { text: 'Beasiswa', link: '/about/scholarship' },
-      { text: 'Employee', link: '/about/employee' }
+      { text: 'Employee', link: '/about/employee' },
+      { text: 'Division', link: '/about/division' },
+      { text: 'Position', link: '/about/position' }
     ]
   },
   { text: 'Produk dan Layanan', link: '/services' },
@@ -111,12 +113,6 @@ const menuItems = [
   { text: 'Lowongan', link: 'https://karir.traspac.id/' },
   { text: 'Kontak', link: '/contact' }
 ]
-
-const isAdmin = ref(false)
-
-onMounted(() => {
-  isAdmin.value = localStorage.getItem('user_role') === 'admin'
-})
 </script>
 
 <style scoped>

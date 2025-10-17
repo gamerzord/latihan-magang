@@ -15,7 +15,7 @@ Route::post('/users', [UserController::class, 'register']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
-  Route::apiResource('products', controller: ProductController::class);
+  Route::apiResource('products', ProductController::class);
   Route::apiResource('users', UserController::class)->except(['store']);
   Route::post('/logout', [AuthController::class, 'logout']);
   Route::apiResource('divisions', DivisionController::class);

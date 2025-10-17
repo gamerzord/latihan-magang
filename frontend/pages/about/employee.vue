@@ -3,18 +3,13 @@
     <v-card class="pa-6">
       <v-card-title class="d-flex justify-space-between align-center">
         <span class="text-h5">Employees</span>
-        <v-btn color="primary" @click="navigateTo('/employees/create')">
+          <v-alert v-if="successMessage" type="success" class="mb-4">{{ successMessage }}</v-alert>
+          <v-alert v-if="errorMessage" type="error" class="mb-4">{{ errorMessage }}</v-alert>
+        <v-btn color="primary" @click="navigateTo('/about/employees/create')">
           <v-icon left>mdi-plus</v-icon>
           Add Employee
         </v-btn>
       </v-card-title>
-
-      <v-alert v-if="successMessage" type="success" class="mb-4">
-        {{ successMessage }}
-      </v-alert>
-      <v-alert v-if="errorMessage" type="error" class="mb-4">
-        {{ errorMessage }}
-      </v-alert>
 
       <!-- Filters -->
       <v-row class="mb-4">
@@ -74,7 +69,7 @@
       <v-data-table
         :items="employees || []"
         :headers="headers"
-        :loading="loading"
+        :loading="loadingEmployees"
         class="elevation-1"
       >
         <template #item.division_id="{ item }">
@@ -91,11 +86,15 @@
           </v-chip>
         </template>
 
+        <template #item.join_date="{ item }">
+          {{ formatDate(item.join_date) }}
+        </template>
+
         <template #item.actions="{ item }">
-          <v-btn variant="text" color="info" @click="navigateTo(`/employees/${item.id}`)">
+          <v-btn variant="text" color="info" @click="navigateTo(`/about/employees/${item.id}`)">
             View
           </v-btn>
-          <v-btn variant="text" color="primary" @click="navigateTo(`/employees/edit/${item.id}`)">
+          <v-btn variant="text" color="primary" @click="navigateTo(`/about/employees/edit/${item.id}`)">
             Edit
           </v-btn>
           <v-btn variant="text" color="error" @click="deleteEmployee(item.id)">
@@ -109,24 +108,89 @@
 
 <script setup lang="ts">
 import type { Employee, Division, Position } from '~/types/models'
+const loading = ref(false)
 
-const token = localStorage.getItem('admin_auth_token')
+if (import.meta.server) {
+  onMounted(() => {
+    const token = useCookie('admin-auth-token').value
+    if (!token) return navigateTo('/dashboard/admin')
+  })
+}
+
 const config = useRuntimeConfig()
 
 const successMessage = ref('')
 const errorMessage = ref('')
-const loading = ref(false)
 
 const filters = ref({
   search: '',
-  division_id: '',
-  position_id: '',
+  division_id: null,
+  position_id: null,
   status: ''
 })
 
-const employees = ref<Employee[]>([])
-const divisions = ref<Division[]>([])
-const positions = ref<Position[]>([])
+const query = computed(() => {
+  const params = new URLSearchParams()
+  if (filters.value.search) params.append('search', filters.value.search)
+  if (filters.value.division_id) params.append('division_id', filters.value.division_id)
+  if (filters.value.position_id) params.append('position_id', filters.value.position_id)
+  if (filters.value.status) params.append('status', filters.value.status)
+  return params.toString()
+})
+
+const statusOptions = ['active', 'inactive', 'resigned']
+
+const headers = [
+  { title: 'Code', key: 'employee_code', sortable: true },
+  { title: 'Name', key: 'name', sortable: true },
+  { title: 'Email', key: 'email', sortable: true },
+  { title: 'Division', key: 'division_id', sortable: false },
+  { title: 'Position', key: 'position_id', sortable: false },
+  { title: 'Join Date', key: 'join_date', sortable: true },
+  { title: 'Status', key: 'status', sortable: true },
+  { title: 'Actions', key: 'actions', sortable: false}
+]
+
+const getStatusColor = (status: string) =>
+  ({ active: 'success', inactive: 'warning', resigned: 'error' }[status] || 'grey')
+
+  const formatDate = (date: Date | string) => {
+    const dateObj = new Date(date)
+
+    if (isNaN(dateObj.getTime())) {
+    return 'Invalid date'
+  }
+
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+const {
+  data: employeeResponse,
+  pending: loadingEmployees,
+  error: fetchError,
+  refresh: refreshEmployees
+} = await useFetch<{ employees: Employee[]} >(
+  () => `${config.public.apiBase}/employees?${query.value}`,
+  {
+    
+    watch: [query],
+  }
+)
+const employees = computed(() => employeeResponse.value?.employees || [])
+
+const { data: divisionsStatus } = await useFetch<{ divisions_active: Division[] }>(
+  `${config.public.apiBase}/divisions-active`
+);
+const divisions = computed(() => divisionsStatus.value?.divisions_active || []);
+
+const { data: positionsStatus } = await useFetch<{ positions_active: Position[] }>(
+  `${config.public.apiBase}/positions-active`
+);
+const positions = computed(() => positionsStatus.value?.positions_active || []);
 
 const getDivisionName = (id: number | null) => {
   const found = divisions.value?.find(d => d.id === id)
@@ -138,82 +202,18 @@ const getPositionName = (id: number | null) => {
   return found ? found.name : '-'
 }
 
-const statusOptions = ['active', 'inactive', 'resigned']
-
-const headers = [
-  { title: 'Code', key: 'employee_code' },
-  { title: 'Name', key: 'name' },
-  { title: 'Email', key: 'email' },
-  { title: 'Division', key: 'division_id' },
-  { title: 'Position', key: 'position_id' },
-  { title: 'Join Date', key: 'join_date' },
-  { title: 'Status', key: 'status' },
-  { title: 'Actions', key: 'actions' }
-]
-
-const getStatusColor = (status: string) =>
-  ({ active: 'success', inactive: 'warning', resigned: 'error' }[status] || 'grey')
-
-const getQuery = () => {
-  const params = new URLSearchParams()
-  if (filters.value.search) params.append('search', filters.value.search)
-  if (filters.value.division_id) params.append('division_id', filters.value.division_id)
-  if (filters.value.position_id) params.append('position_id', filters.value.position_id)
-  if (filters.value.status) params.append('status', filters.value.status)
-  return params.toString()
-}
-
-const fetchEmployees = async () => {
-  loading.value = true
-  errorMessage.value = ''
-  try {
-    const data = await $fetch<{ data: Employee[] }>(
-      `${config.public.apiBase}/employees?${getQuery()}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    employees.value = data.data || []
-  } catch (err: any) {
-    console.error('Error fetching employees:', err)
-    errorMessage.value = err?.data?.message || 'Failed to fetch employees'
-  } finally {
-    loading.value = false
-  }
-}
-
-const fetchDivisions = async () => {
-  try {
-    const data = await $fetch<{ data: Division[] }>(
-      `${config.public.apiBase}/divisions-active`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    divisions.value = data.data || []
-  } catch (e) {
-    console.error('Failed to fetch divisions:', e)
-  }
-}
-
-const fetchPositions = async () => {
-  try {
-    const data = await $fetch<{ data: Position[] }>(
-      `${config.public.apiBase}/positions-active`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    positions.value = data.data || []
-  } catch (e) {
-    console.error('Failed to fetch positions:', e)
-  }
-}
-
 const deleteEmployee = async (id: number) => {
   loading.value = true
+  successMessage.value = ''
   errorMessage.value = ''
+
   try {
     await $fetch(`${config.public.apiBase}/employees/${id}`, {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` }
+      
     })
     successMessage.value = 'Employee deleted successfully'
-    fetchEmployees()
+    refreshEmployees()
   } catch (err: any) {
     console.error('Delete failed:', err)
     errorMessage.value = err?.data?.message || 'Delete Failure'
@@ -222,14 +222,10 @@ const deleteEmployee = async (id: number) => {
   }
 }
 
-watch(filters, () => {
-  clearTimeout((watch as any)._t)
-  ;(watch as any)._t = setTimeout(fetchEmployees, 300)
-}, { deep: true })
-
-onMounted(() => {
-  fetchDivisions()
-  fetchPositions()
-  fetchEmployees()
+watch(fetchError, (err) => {
+  if (err) {
+    console.error('Fetch error:', err)
+    errorMessage.value = 'Failed to fetch employees'
+  }
 })
 </script>

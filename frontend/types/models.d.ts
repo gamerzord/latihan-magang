@@ -3,7 +3,7 @@ export interface Product {
   name: string
   qty: number
   price: number
-  description: Text
+  description: string
 }
 
 export interface User {
@@ -27,9 +27,13 @@ export interface Employee {
   phone: string
   division_id: number | null
   position_id:number | null
-  join_date: Date
+  join_date: Date | string
   status: 'active' | 'inactive' | 'resigned'
-  address: Text
+  address: string
+  created_at: Date | string
+  updated_at: Date | string
+  division?
+  position?
 }
 
 export interface Division {
@@ -38,6 +42,7 @@ export interface Division {
   code: string
   description: string
   is_active: boolean
+  employees_count?: number
 }
 
 export interface Position {
@@ -45,6 +50,7 @@ export interface Position {
   name: string
   code: string
   level: 'staff' | 'supervisor' | 'manager' | 'director' | 'executive'
-  description: Text
+  description: string
   is_active: boolean
+  employees_count?: number
 }

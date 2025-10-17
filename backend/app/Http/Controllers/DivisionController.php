@@ -35,7 +35,7 @@ class DivisionController extends Controller
     return response()->json(
       [
         'message' => 'Division created successfully',
-        'data' => $division,
+        'division' => $division,
       ],
       201,
     );
@@ -135,7 +135,7 @@ class DivisionController extends Controller
 
     return response()->json(
       [
-        'divisions' => $divisions,
+        'divisions_active' => $divisions,
       ],
       200,
     );
